@@ -47,6 +47,39 @@ app.post("/posts", async (req, res) => {
     res.status(500).send("Error al agregar el post");
   }
 });
+// Ruta Put para agregar  un like y revisar posibles errores
+app.put("/posts/like/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query(
+      "UPDATE posts SET likes = likes + 1 WHERE id = $1",
+      [id]
+    );
+    if (result.rowCount === 0) {
+      res.status(404).send("Post no encontrado");
+    } else {
+      res.send("Like agregado");
+    }
+  } catch (err) {
+    console.error("Error al agregar el like:", err);
+    res.status(500).send("Error al agregar el like");
+  }
+});
+// Ruta delete para eliminar un post y encontrar posibles errores
+app.delete("/posts/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query("DELETE FROM posts WHERE id = $1", [id]);
+    if (result.rowCount === 0) {
+      res.status(404).send("Post no encontrado");
+    } else {
+      res.send("Post eliminado");
+    }
+  } catch (err) {
+    console.error("Error al eliminar el post:", err);
+    res.status(500).send("Error al eliminar el post");
+  }
+});
 
 app.listen(port, () => {
   console.log(`Servidor corriendo en http://localhost:${port}`);
